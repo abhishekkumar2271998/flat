@@ -275,15 +275,27 @@ function SectionHead({ title, count, action }: SectionHeadProps) {
         >
           {title}
         </h2>
-        <span
-          className="text-[12.5px] tabular-nums"
-          style={{ color: 'var(--fg-muted)' }}
-        >
-          {count}
-        </span>
+        <CountCircle count={count} />
       </div>
       {action}
     </div>
+  );
+}
+
+// Counts are rendered as a circle so section heads read as "title + tally".
+// Single digits stay a true circle; 2–3 digits grow into a pill via min-w + px.
+function CountCircle({ count }: { count: number }) {
+  return (
+    <span
+      className="inline-flex h-[19px] min-w-[19px] items-center justify-center rounded-full px-1.5 text-[11px] font-medium tabular-nums leading-none"
+      style={{
+        background: 'var(--surface-sunken)',
+        boxShadow: 'inset 0 0 0 1px var(--border-subtle)',
+        color: 'var(--fg-2)',
+      }}
+    >
+      {count > 99 ? '99+' : count}
+    </span>
   );
 }
 
