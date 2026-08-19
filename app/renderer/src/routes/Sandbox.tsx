@@ -31,6 +31,7 @@ import {
   Lead,
   Muted,
 } from '@/components/ui/typography';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useTheme } from '@/hooks/useTheme';
 import { cn } from '@/lib/utils';
 
@@ -93,7 +94,7 @@ function Swatch({ name, value }: { name: string; value: string }) {
 }
 
 export function Sandbox() {
-  const { theme, setTheme, resolved } = useTheme();
+  const { theme, resolved } = useTheme();
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
   return (
@@ -112,27 +113,7 @@ export function Sandbox() {
             </Muted>
           </div>
           <div className="flex shrink-0 items-center gap-2" data-no-screenshot>
-            <Button
-              variant={theme === 'light' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setTheme('light')}
-            >
-              Light
-            </Button>
-            <Button
-              variant={theme === 'dark' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setTheme('dark')}
-            >
-              Dark
-            </Button>
-            <Button
-              variant={theme === 'system' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setTheme('system')}
-            >
-              System
-            </Button>
+            <ThemeToggle />
           </div>
         </div>
 
