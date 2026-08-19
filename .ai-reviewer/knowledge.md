@@ -1,25 +1,20 @@
 # StenoAI reviewer notes
 
 ## Architecture
-StenoAI is an Electron-based application designed to serve as a private AI-powered stenographer, facilitating audio recording, transcription, and summarization of meetings. The codebase is organized into a frontend (React+Vite) residing in the `app` directory, and a Python backend for audio processing and handling AI tasks located in the `src` directory. Configuration files and scripts for building, testing, and dependency management are also included at the project root.
+The StenoAI codebase is designed to be an Electron-based desktop application that facilitates audio recording, transcription, and summarization functionalities, specifically tailored for macOS users. The project is organized into two main folders: `src/` for the Python backend which handles audio recording and processing, and `app/` for the Electron frontend utilizing React and Vite.
 
 ## Conventions
-- **Python Code Style**: Follow PEP 8 guidelines, implement type hints, and use docstrings for functions/classes. For example, `src/audio_recorder.py` adheres to these standards.
-- **JavaScript/TypeScript**: Use semicolons and prefer `const`/`let` over `var`. In the React components (like `app/renderer/src/App.tsx`), patterns from existing files should be followed for consistency.
-- **Directory Structure**:
-  - `app/` - Contains the Electron application and its build configurations.
-  - `src/` - Contains Python code for backend processes.
-  - `simple_recorder.py` - Acts as a command-line interface for the backend functionality.
-- **Tailwind CSS Configuration**: Use utility classes as defined in `app/renderer/tailwind.config.cjs`, extending the theme and managing layouts centrally.
-- **Versioning**: Follow manual semantic versioning as outlined in `CONTRIBUTING.md`, with maintainer oversight for release and version management.
+- **File Structure**: The source code adheres to a clear structure; `src/` contains Python modules for audio functionalities (e.g., `audio_recorder.py`, `transcriber.py`), while `app/` contains all frontend code including the Electron main process (`main.js`) and React components under `renderer/src/`.
+- **JavaScript Coding Style**: In JavaScript files, semicolons are mandatory at the end of every statement, and `const` or `let` is preferred over `var` for variable declarations, as enforced by the ESLint configuration.
+- **Python Coding Style**: Python follows PEP 8 guidelines, with an emphasis on type hints in function definitions and docstrings for all modules (e.g., `simple_recorder.py`).
+- **Version Control**: Semantic versioning is employed manually, as detailed in `CONTRIBUTING.md`, where maintainers manage version bumps while contributors focus on code quality without handling versioning.
+- **Dependency Management**: All Python dependencies are listed in `requirements.txt`, and JavaScript dependencies are managed through `package.json`, including devDependencies for tools like ESLint and Prettier for code quality.
 
 ## Intentional non-standard choices
-- **Python Utilization**: The Python backend uses dynamic type checking with `pydantic` and relies on defined models in `models.py`. This contrasts with conventional static type enforcement methods, possibly affecting maintainability.
-- **Environment Variable Management**: The application loads environment variables from a `.env` file with a custom parser in `app/main.js`, which is less common than using established libraries like `dotenv`. This approach might obfuscate configuration management.
+- **Electron Context Bridging**: The usage of `contextBridge` in `preload.js` intentionally abstracts IPC functionality, ensuring that renderer code remains unaware of Electron APIs. This design choice enhances security by limiting direct access to Node.js features.
 
 ## Watch out for
-- **Anti-patterns in Use**: Ensure RxJS-style subscriptions in React components are properly cleaned up to avoid memory leaks. Example: in `App.tsx`, the `ipc()` event subscriptions should correctly handle potential memory management issues.
-- **File Structure Consistency**: Maintain an organized approach when adding new components or services in `app/renderer/src`, as misplacing files can lead to confusion in the routing and import logic.
-- **Type Safety in TypeScript**: While strict type checking is enabled via TypeScript settings, watch for inconsistencies or untyped variables which could lead to runtime errors, especially in `renderer/src` files.
-
-By adhering to these conventions and being vigilant of specific patterns, contributors can maintain the integrity and maintainability of the StenoAI codebase.
+- **Mixing Python and JavaScript Code**: Ensure that the Python backend and the Electron frontend communicate seamlessly via IPC channels, and avoid hardcoding paths that might fail in production environments (as observed in `main.js`).
+- **Memory Management and Performance Issues**: Given the app’s reliance on audio processing, be vigilant about potential memory leaks, especially when dealing with recording sessions or large data buffers.
+- **Error Handling**: Ensure robust error logging and handling mechanisms in functions that involve external processes (e.g., audio recording) to prevent crashes that could disrupt user experience.
+- **Unit and Integration Testing**: As highlighted in `CONTRIBUTING.md`, test every change locally before submitting a PR. Ensure to include unit tests, particularly for functionalities within `src/` that could be prone to edge cases, like transcript generation and audio processing.
