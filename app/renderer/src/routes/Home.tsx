@@ -143,23 +143,7 @@ function CountCircle({ count }: { count: number }) {
       style={{
         background: 'var(--surface-sunken)',
         boxShadow: 'inset 0 0 0 1px var(--border-subtle)',
-        color: 'var(--fg-2)',
-      }}
-    >
-      {count > 99 ? '99+' : count}
-    </span>
-  );
-}
-
-function summaryLine(_upcomingCount: number): string {
-  return `Start recording from the top-right, or from anywhere with ${shortcut('⌘⇧R', 'Ctrl+Shift+R')}.`;
-}
-
-function firstFolderName(
-  m: Meeting,
-  folderName: Map<string, string>,
-): string | undefined {
-  const id = m.folders?.[0] ?? m.session_info.folders?.[0];
+        color: 'var(--fg-o.folders?.[0];
   if (!id) return undefined;
   return folderName.get(id);
 }
