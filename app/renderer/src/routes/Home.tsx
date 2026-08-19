@@ -30,15 +30,7 @@ export function Home({ mode }: HomeProps) {
         <>
           {mode === 'home' && (
             <div className="mb-10">
-              <div className="mb-1.5 flex items-end justify-between gap-6">
-                <h1 className="home-hello">
-                  {greeting}
-                  <span className="faint">.</span>
-                </h1>
-                <div
-                  className="pb-2 text-[13px] tabular-nums"
-                  style={{ color: 'var(--fg-2)' }}
-                >
+              <div className="mb-1.5 flex items-end justify-between gap-
                   {dateStr}
                 </div>
               </div>
