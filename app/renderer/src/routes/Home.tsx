@@ -150,46 +150,7 @@ export function Home({ mode }: HomeProps) {
                 {summaryLine(upcoming.length)}
               </p>
             </div>
-          )}
 
-          {upcoming.length > 0 && mode === 'home' && (
-            <section className="mb-10">
-              <SectionHead
-                title="Upcoming"
-                count={upcoming.length}
-                action={
-                  <button
-                    type="button"
-                    className="inline-flex items-center rounded p-0.5 transition-colors hover:bg-[color:var(--surface-hover)] disabled:opacity-50"
-                    title="Check for new calendar events"
-                    onClick={() => calendar.refetch()}
-                    disabled={calendar.isFetching}
-                    style={{ color: 'var(--fg-2)' }}
-                  >
-                    <RefreshCw className={`size-3 ${calendar.isFetching ? 'animate-spin' : ''}`} />
-                  </button>
-                }
-              />
-              <div className="flex flex-col gap-2">
-                {upcoming.map((event) => (
-                  <UpcomingCard key={event.id} event={event} />
-                ))}
-              </div>
-            </section>
-          )}
-
-          <section>
-            <SectionHead
-              title={mode === 'meetings' ? 'All notes' : 'Previous'}
-              count={mode === 'meetings' ? filtered.length : previous.length}
-              action={
-                mode === 'meetings' ? (
-                  <div className="relative">
-                    <Search
-                      className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 size-[12px]"
-                      style={{ color: 'var(--fg-muted)' }}
-                    />
-                    <input
                       ref={searchInputRef}
                       type="text"
                       value={search}
