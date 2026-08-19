@@ -1,20 +1,23 @@
-# StenoAI reviewer notes
+# stenoai reviewer notes
 
 ## Architecture
-The StenoAI codebase is designed to be an Electron-based desktop application that facilitates audio recording, transcription, and summarization functionalities, specifically tailored for macOS users. The project is organized into two main folders: `src/` for the Python backend which handles audio recording and processing, and `app/` for the Electron frontend utilizing React and Vite.
+This codebase is an Electron application designed for audio recording, transcription, and summarization tailored for confidential conversations. It is organized into two primary directories: `src/`, which contains the Python backend handling audio processing and model integration, and `app/`, which houses the Electron frontend, including React and Vite configuration. A CLI interface is also provided through `simple_recorder.py`.
 
 ## Conventions
-- **File Structure**: The source code adheres to a clear structure; `src/` contains Python modules for audio functionalities (e.g., `audio_recorder.py`, `transcriber.py`), while `app/` contains all frontend code including the Electron main process (`main.js`) and React components under `renderer/src/`.
-- **JavaScript Coding Style**: In JavaScript files, semicolons are mandatory at the end of every statement, and `const` or `let` is preferred over `var` for variable declarations, as enforced by the ESLint configuration.
-- **Python Coding Style**: Python follows PEP 8 guidelines, with an emphasis on type hints in function definitions and docstrings for all modules (e.g., `simple_recorder.py`).
-- **Version Control**: Semantic versioning is employed manually, as detailed in `CONTRIBUTING.md`, where maintainers manage version bumps while contributors focus on code quality without handling versioning.
-- **Dependency Management**: All Python dependencies are listed in `requirements.txt`, and JavaScript dependencies are managed through `package.json`, including devDependencies for tools like ESLint and Prettier for code quality.
-
+- **Python Style**: Follow PEP 8 guidelines, and utilize type hints in all function definitions to enhance code readability. Docstrings are mandatory for all functions and classes.
+- **JavaScript Style**: Use semicolons, prefer `const` and `let` over `var`, and adhere to existing patterns in the codebase. Ensure proper use of React and TypeScript in the front-end components.
+- **Testing and Linting**: The repository mandates the use of `ruff` for Python linting and `eslint` along with `prettier` for JavaScript/TypeScript, ensuring a consistent code style across both languages.
+- **Feature Branching**: New features should be developed on a feature branch named in the format `feature/your-feature-name` following the project's Git workflow as outlined in `CONTRIBUTING.md`.
+- **Directory Structure**: Maintain a clean structure, following the pattern shown:
+  - `src/` for Python backend code (e.g., `audio_recorder.py`, `transcriber.py`).
+  - `app/` for Electron app files (e.g., `main.js`, `renderer/`).
+  
 ## Intentional non-standard choices
-- **Electron Context Bridging**: The usage of `contextBridge` in `preload.js` intentionally abstracts IPC functionality, ensuring that renderer code remains unaware of Electron APIs. This design choice enhances security by limiting direct access to Node.js features.
+- The project uses manual semantic versioning, which deviates from automated versioning approaches. Maintainers manage version increments using Git commands, while contributors focus solely on coding. Additionally, the decision to rely on TypeScript's newer features, such as `ESNext` modules in `tsconfig.json`, might create issues when using older environments.
+- `mic-monitor` is built using Swift and designed for macOS compatibility only. Its existence is crucial for future Windows porting, which may seem superfluous at the moment.
 
 ## Watch out for
-- **Mixing Python and JavaScript Code**: Ensure that the Python backend and the Electron frontend communicate seamlessly via IPC channels, and avoid hardcoding paths that might fail in production environments (as observed in `main.js`).
-- **Memory Management and Performance Issues**: Given the app’s reliance on audio processing, be vigilant about potential memory leaks, especially when dealing with recording sessions or large data buffers.
-- **Error Handling**: Ensure robust error logging and handling mechanisms in functions that involve external processes (e.g., audio recording) to prevent crashes that could disrupt user experience.
-- **Unit and Integration Testing**: As highlighted in `CONTRIBUTING.md`, test every change locally before submitting a PR. Ensure to include unit tests, particularly for functionalities within `src/` that could be prone to edge cases, like transcript generation and audio processing.
+- Ensure all external dependencies are up-to-date as specified in `requirements.txt` for Python and `package.json` for JavaScript. The use of fixed-version dependencies can lead to issues with updates.
+- Be careful with the management of the Electron app state related to IPC (Inter-Process Communication). The clear separation of concerns between the main and renderer processes must be maintained as defined in `ipc-contract.md` to avoid unintended behavior.
+- Pay special attention to error handling, particularly within async functions in `main.js`, to avoid runtime issues with unhandled promise rejections, especially during status checks and API calls.
+- Avoid relying on implicit behavior from systems like macOS due to differing versions (e.g., CoreAudio support). Always check and document compatibility constraints and how features behave across different macOS versions.
