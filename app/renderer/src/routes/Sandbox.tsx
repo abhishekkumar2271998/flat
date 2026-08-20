@@ -286,47 +286,7 @@ export function Sandbox() {
                 <Row
                   label="Nova Labs — roadmap"
                   trailing="Apr 14"
-                  active
-                  onClick={() => {}}
-                />
-              </div>
-              <Row
-                size="sm"
-                label="Research"
-                collapsible
-                trailing={1}
-                onClick={() => {}}
-                className="text-muted-foreground"
-              />
-            </div>
-            <Stack label="Sizes">
-              <div className="w-[320px] space-y-1">
-                <Row size="sm" label="Small row" trailing="Fri" onClick={() => {}} />
-                <Row size="md" label="Medium row (default)" trailing="3" onClick={() => {}} />
-                <Row size="lg" label="Large row" trailing="Active" onClick={() => {}} />
-              </div>
-            </Stack>
-            <Stack label="States">
-              <div className="w-[320px] space-y-1">
-                <Row label="Default" onClick={() => {}} />
-                <Row label="Active" active onClick={() => {}} />
-                <Row label="Static (no onClick)" />
-                <Row
-                  label="Collapsible, closed"
-                  collapsible
-                  trailing={4}
-                  onClick={() => {}}
-                />
-                <Row
-                  label="Collapsible, open"
-                  collapsible
-                  open
-                  trailing={4}
-                  onClick={() => {}}
-                />
-              </div>
-            </Stack>
-          </Section>
+
 
           <Section id="cards" title="Cards" hint="Flat by default; raised + padded as variants.">
             <Stack label="Flat (default)">
