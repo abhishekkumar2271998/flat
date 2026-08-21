@@ -26,7 +26,108 @@ export function Home({ mode }: HomeProps) {
 
   const emptyState = !meetings.data?.length;
   const isRecording = recording.status === 'recording' || recording.status === 'paused';
+  // Empty-state CTA: idle or processing → start a new recording (auto-navigates;
+  // previous note keeps processing in the background queue); recording/paused
+  // → back to /recording.
+  const onToggleRecording = () => {
+    if (isRecording) {
+      navigate('/recording');
+    } else {
+      void recording.startRecording();
+    }
+  };
 
+  const folderName = React.useMemo(() => {
+    const map = new Map<string, string>();
+    for (const f of folders.data ?? []) map.set(f.id, f.name);
+    return map;
+  }, [folders.data]);
+
+  const upcoming =
+    calendar.data && !calendar.data.needsAuth ? calendar.data.events.slice(0, 3) : [];
+
+  const previous = meetings.data ?? [];
+
+  // Search applies only to /meetings (the All meetings list). Home keeps the
+  // unfiltered Previous list since it's already chronologically grouped.
+  const [search, setSearch] = React.useState('');
+  const searchInputRef = React.useRef<HTMLInputElement>(null);
+  const filtered = React.useMemo(() => {
+    if (mode !== 'meetings') return previous;
+    const needle = search.trim().toLowerCase();
+    if (!needle) return previous;
+    return previous.filter((m) => {
+      const name = m.session_info.name?.toLowerCase() ?? '';
+      const summary = m.summary?.toLowerCase() ?? '';
+      return name.includes(needle) || summary.includes(needle);
+    });
+  }, [mode, previous, search]);
+  const groups = React.useMemo(() => groupPrevious(filtered), [filtered]);
+
+  const greeting = `Ready to capture beautiful notes`;
+  const dateStr = new Date().toLocaleDateString(undefined, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
+
+  return (
+    <MeetingsShell
+      activeSummaryFile={null}
+      contentAlign={emptyState && mode === 'home' ? 'center' : 'top'}
+    >
+      {meetings.isLoading ? (
+        <div className="flex min-h-[40vh] items-center justify-center text-[color:var(--fg-2)]">
+          Loading meetings…
+        </div>
+      ) : emptyState ? (
+        <div className="flex flex-col items-center gap-8 text-center">
+          <AppIcon size={56} />
+          <div className="space-y-3">
+            <h1
+              style={{
+                fontFamily: 'var(--font-serif)',
+                fontSize: 44,
+                lineHeight: 1.1,
+                letterSpacing: '-0.025em',
+                color: 'var(--fg-1)',
+              }}
+            >
+              Welcome to StenoAI.
+            </h1>
+            <p
+              className="text-[17px] leading-[1.55]"
+              style={{ color: 'var(--fg-2)' }}
+            >
+              Capture your first meeting — transcription and summaries happen
+              locally on your Mac.
+            </p>
+            <p className="text-sm" style={{ color: 'var(--fg-muted)' }}>
+              Always get consent when transcribing others.
+            </p>
+          </div>
+          <div className="flex flex-col items-center gap-3">
+            <Button
+              variant={isRecording ? 'destructive' : 'default'}
+              onClick={onToggleRecording}
+              className="gap-2"
+            >
+              {isRecording ? <Square className="size-4" /> : <PencilLine className="size-4" />}
+              {isRecording ? 'Stop recording' : 'New note'}
+            </Button>
+            <p
+              className="flex items-center gap-1.5 text-xs"
+              style={{ color: 'var(--fg-muted)' }}
+            >
+              <span>Quick start:</span>
+              <KbdKey>⌘</KbdKey>
+              <KbdKey>⇧</KbdKey>
+              <KbdKey>R</KbdKey>
+              <span>from anywhere</span>
+            </p>
+          </div>
+        </div>
+      ) : (
         <>
           {mode === 'home' && (
             <div className="mb-10">
@@ -49,7 +150,46 @@ export function Home({ mode }: HomeProps) {
                 {summaryLine(upcoming.length)}
               </p>
             </div>
+          )}
 
+          {upcoming.length > 0 && mode === 'home' && (
+            <section className="mb-10">
+              <SectionHead
+                title="Upcoming"
+                count={upcoming.length}
+                action={
+                  <button
+                    type="button"
+                    className="inline-flex items-center rounded p-0.5 transition-colors hover:bg-[color:var(--surface-hover)] disabled:opacity-50"
+                    title="Check for new calendar events"
+                    onClick={() => calendar.refetch()}
+                    disabled={calendar.isFetching}
+                    style={{ color: 'var(--fg-2)' }}
+                  >
+                    <RefreshCw className={`size-3 ${calendar.isFetching ? 'animate-spin' : ''}`} />
+                  </button>
+                }
+              />
+              <div className="flex flex-col gap-2">
+                {upcoming.map((event) => (
+                  <UpcomingCard key={event.id} event={event} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          <section>
+            <SectionHead
+              title={mode === 'meetings' ? 'All notes' : 'Previous'}
+              count={mode === 'meetings' ? filtered.length : previous.length}
+              action={
+                mode === 'meetings' ? (
+                  <div className="relative">
+                    <Search
+                      className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 size-[12px]"
+                      style={{ color: 'var(--fg-muted)' }}
+                    />
+                    <input
                       ref={searchInputRef}
                       type="text"
                       value={search}
