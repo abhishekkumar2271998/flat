@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+  ChartColumn,
   ChevronDown,
   Globe,
   Home as HomeIcon,
@@ -171,6 +172,7 @@ export function Sidebar({
   // Match /chat as well as any /chat/<id> conversation route — the same Chat
   // tab item should stay highlighted when drilling into a session.
   const isChatActive = currentRoute === '/chat' || currentRoute.startsWith('/chat/');
+  const isAnalyticsActive = currentRoute === '/analytics';
   const isOrgSharedActive = currentRoute.startsWith('/org/');
 
   const orgSession = useOrgSession();
@@ -397,6 +399,15 @@ export function Sidebar({
           >
             <MessageSquare className="size-[14px]" />
             <span className="flex-1 truncate">Chat</span>
+          </button>
+
+          <button
+            type="button"
+            className={cn('sb-row', isAnalyticsActive && 'active')}
+            onClick={() => navigate('/analytics')}
+          >
+            <ChartColumn className="size-[14px]" />
+            <span className="flex-1 truncate">Analytics</span>
           </button>
 
           {orgSignedIn && (

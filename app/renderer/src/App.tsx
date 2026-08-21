@@ -6,6 +6,7 @@ import { Chat } from '@/routes/Chat';
 import { ChatConversation } from '@/routes/ChatConversation';
 import { StreamingProvider } from '@/hooks/useStreamingQuery';
 import { Home } from '@/routes/Home';
+import { Analytics } from '@/routes/Analytics';
 import { MeetingDetail } from '@/routes/MeetingDetail';
 import { FolderDetail } from '@/routes/FolderDetail';
 import { OrgShared, OrgSharedDetail } from '@/routes/OrgShared';
@@ -143,6 +144,7 @@ function RouteView({ route }: { route: string }) {
     const sessionId = safeDecode(route.slice('/chat/'.length));
     return <ChatConversation sessionId={sessionId} />;
   }
+  if (route === '/analytics') return <Analytics />;
   if (route === '/meetings/processing') return <Processing />;
   if (route.startsWith('/meetings/')) {
     const summaryFile = safeDecode(route.slice('/meetings/'.length));
