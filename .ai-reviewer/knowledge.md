@@ -1,21 +1,31 @@
-# StenoAI reviewer notes
+# flat reviewer notes
 
 ## Architecture
-StenoAI is an Electron application that serves as a local AI-powered transcription and meeting notes tool. The codebase is organized into two main directories: `src` for the Python backend handling audio recording, transcription, and summarization, and `app` for the Electron-based frontend built with React and Vite.
+The `flat` codebase is structured as a cross-platform application that utilizes Python for the backend functionality, specifically for audio recording and processing, while the frontend is built as an Electron app utilizing React and Vite. It separates concerns into distinct directories: `src` for the Python backend and `app` for the Electron app, ensuring clear boundaries between the two layers.
 
 ## Conventions
-- **Python Style**: PEP 8 guidelines are strictly followed, with a focus on type hints and consistent docstrings. `simple_recorder.py` provides a consistent CLI interface for users.
-- **JavaScript/TypeScript**: JavaScript uses `const` and `let` instead of `var`, while `package.json` scripts are used for handling tasks such as linting (`lint:renderer` script) and building (`build` script). 
-- **File Structure**: The `app` directory distinguishes between the main process (`main.js`), preload scripts (`preload.js`), and components/routes (`renderer/src`) for readability.
-- **Versioning**: Manual semantic versioning is used, with changes logged in a structured manner, as indicated in `README.md` under "What's New".
-- **Environment Configuration**: Uses a `.env` file to handle sensitive configuration values and maintains security and flexibility when deploying (discussed in `main.js`).
+- **Code Style**:
+  - **Python**: Strict adherence to PEP 8 with type hints and docstrings used for documentation (`src/audio_recorder.py` shows adherence, e.g., function type hints).
+  - **JavaScript/TypeScript**: Use semicolons and `const`/`let` instead of `var`, as specified in the `CONTRIBUTING.md`.
+- **File Structure**: The project follows a clear directory structure:
+  - `app/`: contains the Electron app code, including `renderer` for React components.
+  - `src/`: includes Python scripts for backend processing like `audio_recorder.py` and `transcriber.py`.
+
+- **TypeScript Configuration**: The `tsconfig.json` enforces strict type checking and includes paths for better imports. The use of module resolution and the exclusion of emitting output is configured for a streamlined development experience.
+- **Tailwind CSS Usage**: Tailwind is integrated into the React app, utilizing custom configurations defined in `tailwind.config.cjs`, including theme extensions and animation settings.
 
 ## Intentional non-standard choices
-- The application uses `ruff` for linting in Python instead of a more common tool like `flake8` or `pylint`. Although it may seem unusual, the team has standardized on `ruff` for Python linting tasks.
-- The use of `npm scripts` as a primary way to handle build, development, and testing workflows in JavaScript might slightly differ from other standards where task runners like Gulp or Grunt could be expected.
+- **Dependency Management**: The `Makefile` for the microphone monitor (`mic-monitor/Makefile`) compiles Swift code into a binary, which may seem unconventional in a typical JavaScript/Python setup. However, this is intended for future platform compatibility (i.e., potential Windows support).
+  
+- **Preload Bridge**: In `app/preload.js`, the context bridge is being used to control how the renderer communicates with the main process, ensuring strict boundaries as per Electron best practices, even though it may add complexity. This is an intentional choice to enhance security.
 
 ## Watch out for
-- **Inconsistent Import Paths**: Although the TypeScript configuration includes aliasing (as seen in `tsconfig.json`), inconsistent import paths across files (relative vs absolute) can lead to confusion and errors.
-- **Error Handling**: Ensure that all asynchronous operations in both the backend (Python) and frontend (JavaScript) properly handle errors to avoid silent failures, especially in the Electron context where user feedback is vital.
-- **Limited Test Coverage**: Check for unit tests, particularly for critical functions in Python and React. The use of `playwright` suggests end-to-end testing; however, there may be gaps in covering the application’s logic in isolation.
-- **Resource Management**: In `main.js`, ensure that system resources (like audio capture) are correctly managed and released to prevent memory leaks, particularly in heavy-use cases where recordings are frequent.
+- **Linting/Formatting Issues**: Ensure that `ruff` (for Python) and `eslint` (for JavaScript) are run as part of the local development workflow; missing this may lead to inconsistencies in code quality.
+  
+- **Dependency Management**: Be cautious about dependency versions in `requirements.txt` and `package.json`; keep them updated to avoid security vulnerabilities.
+
+- **Type Safety**: Pay close attention to type safety in TypeScript files, ensuring strict checks are adequately handled to prevent runtime errors.
+
+- **Component Structure**: With React components, ensure that functional components are used consistently and unnecessary class components are avoided (`app/renderer/src/App.tsx` illustrates using functional hooks).
+
+- **Error Handling**: When working with asynchronous calls (e.g., in `app/main.js` for IPC), ensure proper error handling and logging to aid in debugging and user notifications.
