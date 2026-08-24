@@ -218,8 +218,13 @@ createRoot(document.getElementById('root')!).render(<App />);
 // Force a hover on the tallest column of the first chart so the screenshot
 // shows the tooltip + active-band treatment.
 window.setTimeout(() => {
-  const svg = document.querySelectorAll('svg')[0];
-  const hits = svg?.querySelectorAll('rect[fill="transparent"]');
-  const target = hits?.[10];
-  target?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+  // role="img" skips the lucide icons inside the stat tiles.
+  const charts = document.querySelectorAll('svg[role="img"]');
+  const hits = charts[0]?.querySelectorAll('rect[fill="transparent"]');
+  // Column 10 is the tallest — the case where the tooltip would overflow the
+  // top of the chart if the clearance floor were missing.
+  hits?.[10]?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+  const hits2 = charts[1]?.querySelectorAll('rect[fill="transparent"]');
+  // First column of the second chart — checks the left-edge clamp.
+  hits2?.[0]?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
 }, 400);
