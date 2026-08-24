@@ -284,8 +284,9 @@ interface SettingsNavProps {
  * selected sidebar item — same raised surface, same hover — rather than
  * inventing a second "selected row" language for the same shape of control.
  *
- * The left padding lines the labels up with the page title above them, which
- * the rail's own border can't do on its own.
+ * The 38px left padding puts the row labels on the same 48px grid line as the
+ * header's back button (`.sb-row` adds the remaining 10px), so the rail doesn't
+ * read as inset from the page it belongs to.
  */
 function SettingsNav({ tab, onChange }: SettingsNavProps) {
   const refs = React.useRef<Array<HTMLButtonElement | null>>([]);
