@@ -139,7 +139,14 @@ export function Analytics() {
       </header>
 
       <section className="mb-10">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {/* auto-fit rather than a viewport breakpoint: what matters is the
+            width of the notes column, which also shrinks when the sidebar is
+            expanded or resized — a `sm:` breakpoint would keep four cramped
+            tiles in a narrow column on a wide window. */}
+        <div
+          className="grid gap-3"
+          style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(142px, 1fr))' }}
+        >
           <StatTile
             label="Notes captured"
             value={formatCount(totals.noteCount)}

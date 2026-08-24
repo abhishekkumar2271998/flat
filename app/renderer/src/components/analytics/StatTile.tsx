@@ -44,13 +44,13 @@ export function StatTile({ label, value, hint }: StatTileProps) {
  */
 export function WeekDelta({ last7, prev7 }: { last7: number; prev7: number }) {
   const diff = last7 - prev7;
-  if (last7 === 0 && prev7 === 0) return <>none the week before either</>;
-  if (diff === 0) return <>same as the week before</>;
+  if (last7 === 0 && prev7 === 0) return <>none last week either</>;
+  if (diff === 0) return <>same as last week</>;
   const Icon = diff > 0 ? ArrowUp : ArrowDown;
   return (
     <span className="inline-flex items-center gap-1">
       <Icon className="size-[11px]" aria-hidden />
-      {Math.abs(diff)} vs previous 7 days
+      {Math.abs(diff)} vs last week
     </span>
   );
 }

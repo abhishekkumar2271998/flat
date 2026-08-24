@@ -98,7 +98,10 @@ function Panel({ width }: { width: number }) {
       </div>
 
       <section className="mb-10">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div
+          className="grid gap-3"
+          style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(142px, 1fr))' }}
+        >
           <StatTile
             label="Notes captured"
             value={formatCount(totals.noteCount)}
@@ -145,9 +148,50 @@ function Panel({ width }: { width: number }) {
         <FolderBars rows={folders} />
       </section>
 
-      <section>
+      <section className="mb-10">
         <SectionHead title="Longest notes" />
         <LongestList notes={longest} />
+      </section>
+
+      <section>
+        <SectionHead title="Notes per week (table view)" />
+        <table className="w-full text-[12.5px]">
+          <thead>
+            <tr style={{ color: 'var(--fg-2)' }}>
+              {(['Week of', 'Notes', 'Recorded'] as const).map((h, i) => (
+                <th
+                  key={h}
+                  scope="col"
+                  className="pb-2 text-[11.5px] font-medium"
+                  style={{
+                    textAlign: i === 0 ? 'left' : 'right',
+                    borderBottom: '1px solid var(--border-subtle)',
+                  }}
+                >
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {DATA.weeks.slice(0, 4).map((week) => (
+              <tr key={week.start.toISOString()} style={{ color: 'var(--fg-1)' }}>
+                {[week.label, String(week.count), formatDuration(week.seconds)].map((cell, i) => (
+                  <td
+                    key={i}
+                    className="py-[7px] tabular-nums"
+                    style={{
+                      textAlign: i === 0 ? 'left' : 'right',
+                      borderBottom: '1px solid var(--border-subtle)',
+                    }}
+                  >
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </section>
     </div>
   );
@@ -170,3 +214,12 @@ function App() {
 }
 
 createRoot(document.getElementById('root')!).render(<App />);
+
+// Force a hover on the tallest column of the first chart so the screenshot
+// shows the tooltip + active-band treatment.
+window.setTimeout(() => {
+  const svg = document.querySelectorAll('svg')[0];
+  const hits = svg?.querySelectorAll('rect[fill="transparent"]');
+  const target = hits?.[10];
+  target?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+}, 400);
