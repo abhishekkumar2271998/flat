@@ -272,33 +272,74 @@ function GoogleGlyph({ size = 14 }: { size?: number }) {
   );
 }
 
-interface TabButtonProps {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
+interface SettingsNavProps {
+  tab: TabId;
+  onChange: (id: TabId) => void;
 }
 
-function TabButton({ active, onClick, children }: TabButtonProps) {
+/**
+ * Vertical section list down the left of the page.
+ *
+ * Rows reuse the sidebar's `.sb-row` so a selected section reads exactly like a
+ * selected sidebar item — same raised surface, same hover — rather than
+ * inventing a second "selected row" language for the same shape of control.
+ *
+ * The left padding lines the labels up with the page title above them, which
+ * the rail's own border can't do on its own.
+ */
+function SettingsNav({ tab, onChange }: SettingsNavProps) {
+  const refs = React.useRef<Array<HTMLButtonElement | null>>([]);
+
+  // Arrow keys matter more here than they did on the old horizontal strip:
+  // the rail is now the page's primary navigation, and a vertical list of six
+  // is what people try to arrow through.
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    const current = TABS.findIndex((t) => t.id === tab);
+    let next = -1;
+    if (e.key === 'ArrowDown') next = (current + 1) % TABS.length;
+    else if (e.key === 'ArrowUp') next = (current - 1 + TABS.length) % TABS.length;
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = TABS.length - 1;
+    if (next < 0) return;
+    e.preventDefault();
+    onChange(TABS[next].id);
+    refs.current[next]?.focus();
+  };
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        'cursor-pointer border-0 bg-transparent px-3 py-1.5 text-[13px] transition-colors',
-        active ? 'font-medium' : 'font-normal hover:text-[color:var(--fg-1)]',
-      )}
+    <nav
+      role="tablist"
+      aria-orientation="vertical"
+      aria-label="Settings sections"
+      onKeyDown={onKeyDown}
+      className="scrollbar-clean flex flex-col gap-px overflow-y-auto"
       style={{
-        color: active ? 'var(--fg-1)' : 'var(--fg-2)',
-        borderTopLeftRadius: 'var(--radius-sm)',
-        borderTopRightRadius: 'var(--radius-sm)',
-        borderBottom: active
-          ? '2px solid var(--fg-1)'
-          : '2px solid transparent',
-        marginBottom: -1,
+        width: 220,
+        flexShrink: 0,
+        padding: '16px 14px 24px 38px',
+        borderRight: '1px solid var(--border-subtle)',
       }}
     >
-      {children}
-    </button>
+      {TABS.map((t, i) => (
+        <button
+          key={t.id}
+          ref={(el) => {
+            refs.current[i] = el;
+          }}
+          type="button"
+          role="tab"
+          id={`settings-tab-${t.id}`}
+          aria-selected={tab === t.id}
+          aria-controls={`settings-panel-${t.id}`}
+          // Roving tabindex: the list is one Tab stop, then arrows within it.
+          tabIndex={tab === t.id ? 0 : -1}
+          onClick={() => onChange(t.id)}
+          className={cn('sb-row', tab === t.id && 'active')}
+        >
+          <span className="flex-1 truncate">{t.label}</span>
+        </button>
+      ))}
+    </nav>
   );
 }
 
@@ -469,11 +510,11 @@ export function Settings() {
       >
         <header
           style={{
-            padding: '32px 48px 0',
+            padding: '32px 48px 24px',
             borderBottom: '1px solid var(--border-subtle)',
           }}
         >
-          <div className="mb-6 flex items-center gap-3">
+          <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => navigate(getLastNonSettingsRoute() || '/')}
@@ -494,39 +535,39 @@ export function Settings() {
               Settings
             </h1>
           </div>
-          <div className="flex gap-0.5" role="tablist">
-            {TABS.map((t) => (
-              <TabButton
-                key={t.id}
-                active={tab === t.id}
-                onClick={() => setTab(t.id)}
-              >
-                {t.label}
-              </TabButton>
-            ))}
-          </div>
         </header>
 
-        <div
-          className="scrollbar-clean min-h-0 flex-1 overflow-y-auto"
-          style={{ padding: '8px 48px 64px' }}
-        >
-          <div style={{ maxWidth: 600, paddingTop: 8 }}>
-            {tab === 'general' && <GeneralTab />}
-            {tab === 'transcription' && <TranscriptionTab />}
-            {tab === 'ai' && <AiTab />}
-            {tab === 'organisation' && <OrganisationTab />}
-            {tab === 'advanced' && <AdvancedTab />}
-            {tab === 'developer' && <DeveloperTab />}
-          </div>
-          {tab === 'general' && (
+        {/* Rail + panel. The panel scrolls on its own so a long section can't
+            scroll the section list out of reach. */}
+        <div className="flex min-h-0 flex-1">
+          <SettingsNav tab={tab} onChange={setTab} />
+
+          <div
+            className="scrollbar-clean min-h-0 flex-1 overflow-y-auto"
+            style={{ padding: '8px 48px 64px' }}
+          >
             <div
-              className="mt-10 text-center text-[12px]"
-              style={{ color: 'var(--fg-muted)', maxWidth: 600 }}
+              role="tabpanel"
+              id={`settings-panel-${tab}`}
+              aria-labelledby={`settings-tab-${tab}`}
+              style={{ maxWidth: 600, paddingTop: 8 }}
             >
-              StenoAI {version.data?.version ?? ''}
+              {tab === 'general' && <GeneralTab />}
+              {tab === 'transcription' && <TranscriptionTab />}
+              {tab === 'ai' && <AiTab />}
+              {tab === 'organisation' && <OrganisationTab />}
+              {tab === 'advanced' && <AdvancedTab />}
+              {tab === 'developer' && <DeveloperTab />}
             </div>
-          )}
+            {tab === 'general' && (
+              <div
+                className="mt-10 text-center text-[12px]"
+                style={{ color: 'var(--fg-muted)', maxWidth: 600 }}
+              >
+                StenoAI {version.data?.version ?? ''}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </MeetingsShell>
