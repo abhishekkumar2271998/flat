@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { MessageSquare, Moon, MoreHorizontal, Monitor, PanelLeftClose, PanelLeftOpen, PencilLine, Sun } from 'lucide-react';
+import { MessageSquare, Moon, MoreHorizontal, Monitor, PanelLeftClose, PanelLeftOpen, PencilLine, Settings as SettingsIcon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ToolbarIconButton } from '@/components/ui/toolbar-icon-button';
 import { Switch } from '@/components/ui/switch';
 import { AudioWave } from '@/components/AudioWave';
 import {
@@ -14,7 +15,7 @@ import {
 } from '@/hooks/useSettings';
 import type { RecordingStatus } from '@/hooks/useRecording';
 import { useTheme } from '@/hooks/useTheme';
-import { useRoute, navigate } from '@/lib/router';
+import { useRoute, navigate, toggleSettings } from '@/lib/router';
 import { cn } from '@/lib/utils';
 
 interface MainToolbarProps {
@@ -62,11 +63,9 @@ export function MainToolbar({
             so Electron correctly computes the no-drag region even when the
             sidebar aside has pointer-events:none. position:fixed keeps it at
             the same screen coords as the sb-top button position. */}
-        <button
-          type="button"
+        <ToolbarIconButton
           onClick={onToggleSidebar}
-          aria-label={sidebarCollapsed ? 'Show sidebar' : 'Hide sidebar'}
-          title={sidebarCollapsed ? 'Show sidebar' : 'Hide sidebar'}
+          label={sidebarCollapsed ? 'Show sidebar' : 'Hide sidebar'}
           style={{
             position: 'fixed',
             top: 14,
@@ -74,32 +73,38 @@ export function MainToolbar({
             zIndex: 30,
             WebkitAppRegion: 'no-drag',
           } as React.CSSProperties}
-          className="inline-flex h-[26px] w-7 items-center justify-center rounded-md text-[color:var(--fg-2)] transition-colors hover:bg-[color:var(--surface-hover)] hover:text-[color:var(--fg-1)]"
         >
           {sidebarCollapsed ? (
             <PanelLeftOpen className="size-[15px]" />
           ) : (
             <PanelLeftClose className="size-[15px]" />
           )}
-        </button>
+        </ToolbarIconButton>
         <RecordingOptionsPopover />
-        <button
-          type="button"
+        <ToolbarIconButton
           onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-          aria-label={
+          label={
             resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
           }
-          title={
-            resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
-          }
-          className="inline-flex h-[26px] w-7 items-center justify-center rounded-md text-[color:var(--fg-2)] transition-colors hover:bg-[color:var(--surface-hover)] hover:text-[color:var(--fg-1)]"
         >
           {resolvedTheme === 'dark' ? (
             <Sun className="size-[15px]" />
           ) : (
             <Moon className="size-[15px]" />
           )}
-        </button>
+        </ToolbarIconButton>
+        {/* Settings is also in the sidebar footer, but that footer is hidden
+            while the sidebar is collapsed — without this the only way in would
+            be the tray menu. startsWith so deep-links like
+            /settings?tab=organisation still read as the current route. */}
+        <ToolbarIconButton
+          onClick={() => toggleSettings(route)}
+          label="Settings"
+          active={route.startsWith('/settings')}
+          aria-pressed={route.startsWith('/settings')}
+        >
+          <SettingsIcon className="size-[15px]" />
+        </ToolbarIconButton>
         <button
           type="button"
           onClick={showChatPrimary ? () => navigate('/chat') : onToggleRecording}

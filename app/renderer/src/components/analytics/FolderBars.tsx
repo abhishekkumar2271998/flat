@@ -22,14 +22,14 @@ export function FolderBars({ rows }: { rows: FolderBucket[] }) {
           <div className="flex min-w-0 items-center gap-2">
             {/* Identity sits in the dot beside the label, never in the bar:
                 folder colours are user-chosen and unvalidated, so they never
-                carry the data itself. */}
-            {row.color && (
-              <span
-                aria-hidden
-                className="size-[7px] shrink-0 rounded-full"
-                style={{ background: row.color }}
-              />
-            )}
+                carry the data itself. Always rendered — the Unfiled and Other
+                rows have no colour, and dropping the dot would leave their
+                labels hanging left of every other row. */}
+            <span
+              aria-hidden
+              className="size-[7px] shrink-0 rounded-full"
+              style={{ background: row.color ?? 'var(--border-strong)' }}
+            />
             <span className="truncate text-[13px]" style={{ color: 'var(--fg-1)' }}>
               {row.name}
             </span>

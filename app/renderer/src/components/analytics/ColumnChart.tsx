@@ -6,6 +6,11 @@ import { BAR_FILL, BAR_FILL_ACTIVE, clamp, columnPath } from '@/components/analy
 const PAD = { top: 22, right: 6, bottom: 26, left: 38 };
 /** Bars are capped rather than filling their slot — the leftover band is air. */
 const MAX_BAR_WIDTH = 24;
+/** The tooltip sits above the mark, so the tallest column would push it off
+ *  the top of the chart. Floor its anchor at roughly its own height instead. */
+const TOOLTIP_CLEARANCE = 48;
+/** Keeps the tooltip's centre far enough in that its edges stay on the chart. */
+const TOOLTIP_INSET = 76;
 
 export interface Column {
   label: string;
@@ -159,8 +164,12 @@ export function ColumnChart({
 
       {active && hover !== null && (
         <ChartTooltip
-          x={clamp(PAD.left + band * hover + band / 2, 76, Math.max(76, width - 76))}
-          y={yOf(active.value) - 10}
+          x={clamp(
+            PAD.left + band * hover + band / 2,
+            TOOLTIP_INSET,
+            Math.max(TOOLTIP_INSET, width - TOOLTIP_INSET),
+          )}
+          y={Math.max(TOOLTIP_CLEARANCE, yOf(active.value) - 10)}
           title={active.tooltipTitle}
           body={active.tooltipBody}
         />
@@ -183,7 +192,7 @@ function ChartTooltip({ x, y, title, body }: ChartTooltipProps) {
       className="pointer-events-none absolute z-10 whitespace-nowrap px-2.5 py-1.5"
       style={{
         left: x,
-        top: Math.max(0, y),
+        top: y,
         transform: 'translate(-50%, -100%)',
         background: 'var(--surface-raised)',
         border: '1px solid var(--border-subtle)',

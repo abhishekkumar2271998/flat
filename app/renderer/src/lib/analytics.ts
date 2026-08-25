@@ -291,7 +291,10 @@ function niceStep(raw: number, integersOnly: boolean): number {
   if (!Number.isFinite(raw) || raw <= 0) return 1;
   const magnitude = Math.pow(10, Math.floor(Math.log10(raw)));
   const scaled = raw / magnitude;
-  const ladder = integersOnly ? [1, 2, 5, 10] : [1, 2, 2.5, 5, 10];
+  // 4 is on the ladder so the very common "max just over a round number" case
+  // (12 notes, 10.2 hours) doesn't jump the axis to 15 and leave the peak
+  // column looking stunted.
+  const ladder = integersOnly ? [1, 2, 4, 5, 10] : [1, 2, 2.5, 4, 5, 10];
   const step = (ladder.find((c) => scaled <= c) ?? 10) * magnitude;
   return integersOnly ? Math.max(1, Math.round(step)) : step;
 }
