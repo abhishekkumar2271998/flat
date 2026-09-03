@@ -131,15 +131,7 @@ export function Home({ mode }: HomeProps) {
         <>
           {mode === 'home' && (
             <div className="mb-10">
-              <div className="mb-1.5 flex items-end justify-between gap-6">
-                <h1 className="home-hello">
-                  {greeting}
-                  <span className="faint">.</span>
-                </h1>
-                <div
-                  className="pb-2 text-[13px] tabular-nums"
-                  style={{ color: 'var(--fg-2)' }}
-                >
+              <div className="mb-1.5 flex items-end justify-between gap-
                   {dateStr}
                 </div>
               </div>
@@ -223,103 +215,7 @@ export function Home({ mode }: HomeProps) {
             />
             {groups.length === 0 && mode === 'meetings' && search.trim() ? (
               <div
-                className="px-6 py-12 text-center text-[13px]"
-                style={{ color: 'var(--fg-2)' }}
-              >
-                No meetings match &ldquo;{search.trim()}&rdquo;.
-              </div>
-            ) : (
-              groups.map((g) => (
-                <div key={g.label}>
-                  <div
-                    className="pb-2 pt-4 text-[11.5px] font-medium tracking-[0.02em]"
-                    style={{ color: 'var(--fg-2)' }}
-                  >
-                    {g.label}
-                  </div>
-                  <div>
-                    {g.items.map((m) => (
-                      <PreviousRow
-                        key={m.session_info.summary_file}
-                        meeting={m}
-                        folderName={firstFolderName(m, folderName)}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))
-            )}
-          </section>
-        </>
-      )}
-    </MeetingsShell>
-  );
-}
 
-interface SectionHeadProps {
-  title: string;
-  count: number;
-  action?: React.ReactNode;
-}
-
-function SectionHead({ title, count, action }: SectionHeadProps) {
-  return (
-    <div
-      className="mb-3.5 flex items-baseline justify-between pb-2.5"
-      style={{ borderBottom: '1px solid var(--border-subtle)' }}
-    >
-      <div className="flex items-baseline gap-2.5">
-        <h2
-          className="text-sm font-medium tracking-[-0.005em]"
-          style={{ color: 'var(--fg-1)', fontFamily: 'var(--font-sans)' }}
-        >
-          {title}
-        </h2>
-        <CountCircle count={count} />
-      </div>
-      {action}
-    </div>
-  );
-}
-
-// Counts are rendered as a circle so section heads read as "title + tally".
-// Single digits stay a true circle; 2–3 digits grow into a pill via min-w + px.
-function CountCircle({ count }: { count: number }) {
-  return (
-    <span
-      className="inline-flex h-[19px] min-w-[19px] items-center justify-center rounded-full px-1.5 text-[11px] font-medium tabular-nums leading-none"
-      style={{
-        background: 'var(--surface-sunken)',
-        boxShadow: 'inset 0 0 0 1px var(--border-subtle)',
-        color: 'var(--fg-2)',
-      }}
-    >
-      {count > 99 ? '99+' : count}
-    </span>
-  );
-}
-
-function summaryLine(_upcomingCount: number): string {
-  return `Start recording from the top-right, or from anywhere with ${shortcut('⌘⇧R', 'Ctrl+Shift+R')}.`;
-}
-
-function firstFolderName(
-  m: Meeting,
-  folderName: Map<string, string>,
-): string | undefined {
-  const id = m.folders?.[0] ?? m.session_info.folders?.[0];
-  if (!id) return undefined;
-  return folderName.get(id);
-}
-
-interface Group {
-  label: string;
-  items: Meeting[];
-}
-
-function groupPrevious(meetings: Meeting[]): Group[] {
-  const groups: Record<string, Meeting[]> = {};
-  const order: string[] = [];
   const now = new Date();
   const sorted = [...meetings].sort((a, b) => {
     const ta = new Date(a.session_info.processed_at ?? a.session_info.updated_at ?? 0).getTime();
